@@ -1,6 +1,8 @@
 'use client'
 import SearchInput from '@/components/SearchInput';
 import { useRef, useState } from 'react';
+import { ScraperManager } from '@/utils/ScraperManager';
+import { ScraperType } from '@/utils/ScraperManager';
 
 export default function HomePage() {
   const [searchComponents, setSearchComponents] = useState([1, 2, 3]);
@@ -18,12 +20,30 @@ export default function HomePage() {
     }
   };
 
-  const handleSearch = () => {
-    const searchData = searchInputRefs.current
-      .filter(ref => ref !== null)
-      .map(ref => ref.getSearchData());
-    console.log('Search Data:', searchData);
-    // 这里可以添加处理搜索数据的逻辑
+  const handleSearch = async () => {
+    try {
+      const searchData = searchInputRefs.current
+        .filter(ref => ref !== null)
+        .map(ref => ref.getSearchData());
+
+      for (const data of searchData) {
+        const { query, source } = data;
+        if (!source) continue;
+
+        try {
+          if (ScraperManager.validateUrl(query as ScraperType, source)) {
+            const scrapedData = await ScraperManager.scrape(query as ScraperType, source);
+            console.log(`Scraped data for ${query}:`, scrapedData);
+          } else {
+            console.error(`Invalid URL for ${query}: ${source}`);
+          }
+        } catch (error) {
+          console.error(`Error scraping ${query}:`, error);
+        }
+      }
+    } catch (error) {
+      console.error('Search error:', error);
+    }
   };
 
   return (
