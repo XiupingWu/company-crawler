@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Scraped data
+/public/data/companies/*
+!/public/data/companies/.gitkeep

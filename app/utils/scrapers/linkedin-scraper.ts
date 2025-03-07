@@ -15,7 +15,7 @@ interface LinkedInCompanyInfo {
 export async function scrapeLinkedInCompany(url: string): Promise<LinkedInCompanyInfo> {
   
   const browser = await puppeteer.launch({
-    headless: true,
+    headless: false,
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
     executablePath: executablePath()
   });
@@ -30,6 +30,7 @@ export async function scrapeLinkedInCompany(url: string): Promise<LinkedInCompan
 
     // 获取公司信息
     const companyInfo = await page.evaluate(() => {
+      
       const name = document.querySelector('.org-top-card-summary__title')?.textContent?.trim() || '';
       const description = document.querySelector('.org-about-us-organization-description')?.textContent?.trim() || '';
       
@@ -75,8 +76,8 @@ ${post.content}
 }
 
 async function saveMarkdown(fileName: string, content: string): Promise<void> {
-  const outputDir = path.join(process.cwd(), 'output');
   
+  const outputDir = path.join(process.cwd(), 'public', 'data', 'companies');
   // 确保输出目录存在
   await fs.mkdir(outputDir, { recursive: true });
   
